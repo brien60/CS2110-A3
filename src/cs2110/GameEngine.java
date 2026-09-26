@@ -80,10 +80,69 @@ public class GameEngine {
      * are all satisfied.
      */
     private boolean invariantSatisfied() {
-        // TODO 1: Update the definition of this method so that it conforms to its specifications.
-        //  Throughout the assignment, practice good defensive programming by asserting the class
-        //  invariant before returning from any non-private mutator methods in `GameEngine`.
-        throw new UnsupportedOperationException();
+        // player
+        for (int i = 0; i < players.length; i++) {
+            if (i < numLivingPlayers) {
+                if (players[i].health() <= 0) return false;
+            }
+            else {
+                if (players[i].health() != 0) return false;
+            }
+        }
+
+        // numLivingPlayers
+        if (numLivingPlayers < 0 || numLivingPlayers > players.length) return false;
+
+        // monsters
+        for (int i = 0; i < monsters.length; i++) {
+            if (i < numLivingMonsters) {
+                if (monsters[i].health() <= 0) return false;
+            }
+            else {
+                if (monsters[i].health() != 0) return false;
+            }
+        }
+
+        // numLivingMonsters
+        if (numLivingMonsters < 0 || numLivingMonsters > monsters.length) return false;
+
+        // weapons
+        for (int i = 0; i < weapons.length; i++) {
+            if (i < numAvailableWeapons) {
+                for (int j = 0; j < players.length; j++) {
+                    if (players[j].weapon() != null && players[j].weapon() == weapons[i]) {
+                        /* invariant is broken if a weapon in weapons[..numAvailableWeapons)
+                        is currently equipped by a character */
+                        return false;
+                    }
+                }
+            }
+            else {
+                for (int j = 0; j < players.length; j++) {
+                    if (players[j].weapon() != null && players[j].weapon() == weapons[i]) {
+                        break;
+                    }
+                    if (j == players.length - 1) return false;
+                    /* invariant is broken if a weapon in weapons[numAvailableWeapons..]
+                    is not currently equipped by a character */
+                }
+            }
+        }
+
+        // numAvailable
+        if (numAvailableWeapons < 0 || numAvailableWeapons > weapons.length) return false;
+
+        // potions
+        // How distinct potion types?
+
+        // potionQuantities
+        if (potionQuantities.length != potions.length) return false;
+        for (int i = 0; i < potionQuantities.length; i++) {
+            if (potionQuantities[i] < 0) return false;
+        }
+
+        return true;
+
     }
 
     /* *****************************************************************************
