@@ -228,11 +228,9 @@ public class GameEngine {
             System.out.print((i + 1) + ": ");
             String name = getInputLine();
 
-            // TODO: Comment out the next line and uncomment the following two lines after completing
-            //  your `Fighter` implementation so that you'll be able to test your `Player` subtypes.
-            int type = -1;
-            //int type = querySelection("Player Type", "What type of player is " + name + "?",
-            //    new String[]{ "Fighter", "HealingMage", "StunningMage", "PotionMage"}, null);
+//            int type = -1;
+            int type = querySelection("Player Type", "What type of player is " + name + "?",
+                new String[]{ "Fighter", "HealingMage", "StunningMage", "PotionMage"}, null);
             players[i] = createPlayer(name, type);
             System.out.println();
         }
@@ -245,7 +243,7 @@ public class GameEngine {
         // TODO: Uncomment the case lines as you implement these player subtypes
         return switch (type) {
             case -1 -> new BasicPlayer(name, this);
-            // case 0 -> new Fighter(name, this);
+             case 0 -> new Fighter(name, this);
             // case 1 -> new HealingMage(name, this);
             // case 2 -> new StunningMage(name, this);
             // case 3 -> new PotionMage(name, this);
@@ -303,16 +301,7 @@ public class GameEngine {
         actor.takeDamage(damageAmount);
 
         if (actor.health() == 0) {
-            if (actor.actorType().equals("basic player")) {
-                for (int i = 0; i < numLivingPlayers; i++) {
-                    if (actor == players[i]) {
-                        swap(players, numLivingPlayers-1, i);
-                        break;
-                    }
-                }
-                numLivingPlayers--;
-            }
-            else if (actor.actorType().equals("monster")) {
+            if (actor.actorType().equals("monster")) {
                 for (int i = 0; i < numLivingMonsters; i++) {
                     if (actor == monsters[i]) {
                         swap(monsters, numLivingMonsters-1, i);
@@ -320,6 +309,22 @@ public class GameEngine {
                     }
                 }
                 numLivingMonsters--;
+            }
+            else { // A player
+                if (actor.actorType().equals("fighter")) {
+                    Weapon equippedWeapon = actor.weapon();
+                    if (equippedWeapon != null) {
+                        updateWeapons(-1, equippedWeapon);
+                    }
+                }
+
+                for (int i = 0; i < numLivingPlayers; i++) {
+                    if (actor == players[i]) {
+                        swap(players, numLivingPlayers-1, i);
+                        break;
+                    }
+                }
+                numLivingPlayers--;
             }
         }
         assert invariantSatisfied();
@@ -424,6 +429,34 @@ public class GameEngine {
         return querySelection("Yes/No", query, new String[]{"No", "Yes"}, null) == 1;
     }
 
+    public int queryWeaponSelection(Weapon currentWeapon) {
+        String query = "Select the weapon that you'd like to equip:";
+        Weapon[] options = Arrays.copyOfRange(weapons, 0, numAvailableWeapons);
+
+        String defaultOption = currentWeapon == null ? null : "Unequip " + currentWeapon.name();
+        return querySelection("Weapon Selection", query, options, defaultOption);
+    }
+
+    public Weapon updateWeapons(int selection, Weapon equippedWeapon) {
+        if (selection == -1) {
+            for (int i = numAvailableWeapons; i < weapons.length; i++) {
+                if (weapons[i] == equippedWeapon) {
+                    swap(weapons, i, numAvailableWeapons);
+                    numAvailableWeapons++;
+
+                    assert invariantSatisfied();
+                    return null;
+                }
+            }
+        }
+        // User doesn't want to unequip current weapon
+        swap(weapons, selection, numAvailableWeapons-1);
+        numAvailableWeapons--;
+        assert invariantSatisfied();
+        return weapons[numAvailableWeapons];
+    }
+
+
     /**
      * Presents the user with a list of numbered `options` with the given `query`, prompting them
      * to input a number to make a selection. Validates the input before returning it. If
@@ -521,10 +554,8 @@ public class GameEngine {
 
             Actor[] actors; // contains living Actors in their turn order for this round
             actors = new Actor[numLivingPlayers + numLivingMonsters];
-            for (int i = 0; i < actors.length; i++) {
-                if (i < numLivingPlayers) actors[i] = players[i];
-                else actors[i] = monsters[i - numLivingPlayers];
-            }
+            System.arraycopy(players, 0, actors, 0, numLivingPlayers);
+            System.arraycopy(monsters, 0, actors, numLivingPlayers, numLivingMonsters);
 
             shuffle(actors); // randomize the turn order within this round
             System.out.println("The turn order will be:");
@@ -532,7 +563,7 @@ public class GameEngine {
                 System.out.println((i + 1) + ": " + actors[i]);
             }
 
-            for (int i = 0; i < actors.length; i++) {
+            for (int i = 0; i < actors.length; i++) { // have the actors take their turns
                 if (numLivingPlayers == 0 || numLivingMonsters == 0) break;
 
                 if (actors[i].health() != 0) {
