@@ -300,8 +300,30 @@ public class GameEngine {
      * the first dead actor in its array.
      */
     public void assignDamageTo(Actor actor, int damageAmount) {
-        // TODO 2: Implement this method according to its specifications.
-        throw new UnsupportedOperationException();
+        actor.takeDamage(damageAmount);
+
+        if (actor.health() == 0) {
+            if (actor.actorType().equals("basic player")) {
+                for (int i = 0; i < numLivingPlayers; i++) {
+                    if (actor == players[i]) {
+                        swap(players, numLivingPlayers-1, i);
+                        break;
+                    }
+                }
+                numLivingPlayers--;
+            }
+            else if (actor.actorType().equals("monster")) {
+                for (int i = 0; i < numLivingMonsters; i++) {
+                    if (actor == monsters[i]) {
+                        swap(monsters, numLivingMonsters-1, i);
+                        break;
+                    }
+                }
+                numLivingMonsters--;
+            }
+        }
+        assert invariantSatisfied();
+
     }
 
 
@@ -498,31 +520,37 @@ public class GameEngine {
             System.out.printf("Starting Round %d%n%n", round);
 
             Actor[] actors; // contains living Actors in their turn order for this round
-            // TODO 3A: Initialize `actors` to an array containing all living players in their
-            //  order in `players`, followed by all living monsters in their order in `monsters`.
-            //  The array's size should be chosen to exactly hold these entries with no empty
-            //  spaces. After you've done this, uncomment the lines between TODOs 3A and 3B.
+            actors = new Actor[numLivingPlayers + numLivingMonsters];
+            for (int i = 0; i < actors.length; i++) {
+                if (i < numLivingPlayers) actors[i] = players[i];
+                else actors[i] = monsters[i - numLivingPlayers];
+            }
 
-            //shuffle(actors); // randomize the turn order within this round
-            //System.out.println("The turn order will be:");
-            //for (int i = 0; i < actors.length; i++) {
-            //    System.out.println((i + 1) + ": " + actors[i]);
-            //}
+            shuffle(actors); // randomize the turn order within this round
+            System.out.println("The turn order will be:");
+            for (int i = 0; i < actors.length; i++) {
+                System.out.println((i + 1) + ": " + actors[i]);
+            }
 
-            // TODO 3B: As long as the game has not ended, iterate over the actors in
-            //  this round's turn order. If the actor whose turn it is remains alive, announce
-            //  the start of their turn by printing a three-line message. The first line consists
-            //  of 42 '-'s. The second line reads "Starting <name>'s Turn:" where <name> is the
-            //  name of this actor. The third line is empty. Then, have the actor take their turn.
+            for (int i = 0; i < actors.length; i++) {
+                if (numLivingPlayers == 0 || numLivingMonsters == 0) break;
+
+                if (actors[i].health() != 0) {
+                    System.out.println("-------------------------------------------------");
+                    System.out.printf("Starting %s's Turn:\n\n", actors[i].name());
+                    actors[i].takeTurn();
+                }
+            }
 
             round++;
         }
 
-        // TODO 3C: Since we broke out of the game loop, the game has ended. Print the
-        //  appropriate game end message, followed by a newline: "Congratulations! You defeated
-        //  the monsters!" in the case of a win, "The monsters defeated you. Better luck next
-        //  time!" in the case of a loss.
-    }
+        if (numLivingPlayers == 0) {
+            System.out.println("The monsters defeated you. Better luck next time!");
+        }
+        else
+            System.out.println("Congratulations! You defeated the monsters!");
+        }
 
     /**
      * Runs this game simulation.
