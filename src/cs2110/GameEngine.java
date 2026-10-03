@@ -438,18 +438,21 @@ public class GameEngine {
     }
 
     public Weapon updateWeapons(int selection, Weapon equippedWeapon) {
-        if (selection == -1) {
-            for (int i = numAvailableWeapons; i < weapons.length; i++) {
+        if (equippedWeapon != null) { // unequip current weapon
+            for(int i = numAvailableWeapons; i < weapons.length; i++) {
                 if (weapons[i] == equippedWeapon) {
                     swap(weapons, i, numAvailableWeapons);
                     numAvailableWeapons++;
-
-                    assert invariantSatisfied();
-                    return null;
                 }
             }
         }
-        // User doesn't want to unequip current weapon
+
+        if (selection == -1) {
+            assert invariantSatisfied();
+            return null;
+        }
+
+        // Equip a new weapon
         swap(weapons, selection, numAvailableWeapons-1);
         numAvailableWeapons--;
         assert invariantSatisfied();
