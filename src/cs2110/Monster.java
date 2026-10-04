@@ -16,6 +16,11 @@ public class Monster extends Actor {
     private final int toughness;
 
     /**
+     * Whether the monster is currently stunned.
+     */
+    private boolean stunned;
+
+    /**
      * Constructs a new monster with the given `name`. Its power and toughness levels are randomly
      * initialized to an int value between 10 and 20, inclusive.
      */
@@ -23,6 +28,7 @@ public class Monster extends Actor {
         super(name, engine);
         power = engine.diceRoll(10, 20);
         toughness = engine.diceRoll(10, 20);
+        stunned = false;
     }
 
     @Override
@@ -41,6 +47,16 @@ public class Monster extends Actor {
     }
 
     /**
+     * Stuns the monster if `stunned == false`.
+     * If `stunned == true`, then nothing happens.
+     */
+    public void stun() {
+        if (!stunned) {
+            stunned = true;
+        }
+    }
+
+    /**
      * Launches an attack against a random targetable player unless stunned, in which case it passes
      * its turn. If no players are targetable, this monster also passes its turn.
      */
@@ -48,6 +64,12 @@ public class Monster extends Actor {
     public void takeTurn() {
         // Note: Monsters cannot be stunned in the starter code.
         // Note: In the starter code, all living players are targetable.
+        if (stunned) {
+            System.out.printf("%s is stunned! Their turn is skipped.\n", name());
+            stunned = false;
+            return;
+        }
+
         Player[] targetablePlayers = engine.targetablePlayers();
         int l = targetablePlayers.length;
         Player target = targetablePlayers[engine.diceRoll(0, l - 1)];
