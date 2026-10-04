@@ -244,7 +244,7 @@ public class GameEngine {
         return switch (type) {
             case -1 -> new BasicPlayer(name, this);
              case 0 -> new Fighter(name, this);
-            // case 1 -> new HealingMage(name, this);
+             case 1 -> new HealingMage(name, this);
             // case 2 -> new StunningMage(name, this);
             // case 3 -> new PotionMage(name, this);
             default -> throw new IllegalArgumentException();
