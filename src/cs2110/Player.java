@@ -17,6 +17,21 @@ public abstract class Player extends Actor {
      */
     private final int baseToughness;
 
+    /**
+     * Whether the player currently has their power boosted by a BuffPotion.
+     */
+    private boolean buff;
+
+    /**
+     * Whether the player currently has their toughness boosted by a TuffPotion.
+     */
+    private boolean tuff;
+
+    /**
+     * Whether the player is currently invisible due to consuming an InvisibilityPotion.
+     */
+    private boolean invisible;
+
 
     /**
      * Constructs a new player with the given `name`. Their base power and toughness levels are
@@ -26,17 +41,56 @@ public abstract class Player extends Actor {
         super(name, engine);
         basePower = engine.diceRoll(10, 20);
         baseToughness = engine.diceRoll(10, 20);
+        resetPotionBuffs();
     }
 
     @Override
     public int power() {
-        return basePower;
+        return buff ? 2*basePower : basePower;
     }
 
     @Override
     public int toughness() {
-        return baseToughness;
+        return tuff ? 2*baseToughness : baseToughness;
     }
+
+    /**
+     * Sets `buff`, `tuff`, and `invisible` all to false.
+     */
+    public void resetPotionBuffs() {
+        buff = false;
+        tuff = false;
+        invisible = false;
+    }
+
+    /**
+     * Sets `buff` to true.
+     */
+    public void consumeBuffPotion() {
+        buff = true;
+    }
+
+    /**
+     * Sets `tuff` to true.
+     */
+    public void consumeTuffPotion() {
+        tuff = true;
+    }
+
+    /**
+     * Sets `invisible` to true.
+     */
+    public void consumeInvisibilityPotion() {
+        invisible = true;
+    }
+
+    /**
+     * Returns `invisible`.
+     */
+    public boolean isInvisible() {
+        return invisible;
+    }
+
 
     /**
      * Uses the console to query the user for whether they would like to use a potion and 
@@ -45,6 +99,8 @@ public abstract class Player extends Actor {
      */
     @Override
     public void takeTurn() {
+        resetPotionBuffs();
+
         Potion potion = engine.selectPotion();
 
         if (potion != null) {

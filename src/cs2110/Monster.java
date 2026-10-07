@@ -72,6 +72,11 @@ public class Monster extends Actor {
 
         Player[] targetablePlayers = engine.targetablePlayers();
         int l = targetablePlayers.length;
+
+        if (l == 0) {
+            System.out.printf("%s couldn't see anyone to attack this turn\n", name());
+            return;
+        }
         Player target = targetablePlayers[engine.diceRoll(0, l - 1)];
         System.out.printf("%s chooses to attack %s.\n", name(), target.name());
         attack(target);

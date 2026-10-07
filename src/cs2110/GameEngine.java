@@ -192,9 +192,7 @@ public class GameEngine {
         weapons = new Weapon[0];
         numAvailableWeapons = 0;
 
-        // TODO: Delete the next line and uncomment the line after it once you have implemented the Potion subtypes
-        potions = new Potion[0];
-        //potions = new Potion[] {new BuffPotion(), new TuffPotion(), new InvisibilityPotion()};
+        potions = new Potion[] {new BuffPotion(), new TuffPotion(), new InvisibilityPotion()};
         potionQuantities = new int[potions.length];
     }
 
@@ -246,7 +244,7 @@ public class GameEngine {
              case 0 -> new Fighter(name, this);
              case 1 -> new HealingMage(name, this);
              case 2 -> new StunningMage(name, this);
-            // case 3 -> new PotionMage(name, this);
+             case 3 -> new PotionMage(name, this);
             default -> throw new IllegalArgumentException();
         };
     }
@@ -369,6 +367,37 @@ public class GameEngine {
         return selected;
     }
 
+    public Weapon updateWeapons(int selection, Weapon equippedWeapon) {
+        if (equippedWeapon != null) { // unequip current weapon
+            for(int i = numAvailableWeapons; i < weapons.length; i++) {
+                if (weapons[i] == equippedWeapon) {
+                    swap(weapons, i, numAvailableWeapons);
+                    numAvailableWeapons++;
+                }
+            }
+        }
+
+        if (selection == -1) {
+            assert invariantSatisfied();
+            return null;
+        }
+
+        // Equip a new weapon
+        swap(weapons, selection, numAvailableWeapons-1);
+        numAvailableWeapons--;
+        assert invariantSatisfied();
+        return weapons[numAvailableWeapons];
+    }
+
+    /**
+     * Increments potionQuantities[i] by 1.
+     * Requires `0 <= i < potionQuantities.length`.
+     */
+    public void addPotion(int i) {
+        potionQuantities[i]++;
+        assert invariantSatisfied();
+    }
+
     /* *****************************************************************************
      * Game state accessor methods                                                 *
      *******************************************************************************/
@@ -378,7 +407,18 @@ public class GameEngine {
      * can currently be targeted by spells and monster attacks, in their order in `players`.
      */
     public Player[] targetablePlayers() {
-         return Arrays.copyOf(players, numLivingPlayers);
+        int numTargetablePlayers = 0;
+        Player[] targetablePlayers = new Player[numLivingPlayers];
+
+        for (int i = 0; i < numLivingPlayers; i++) {
+            Player currentPlayer = players[i];
+
+            if (!currentPlayer.isInvisible()) {
+                targetablePlayers[numTargetablePlayers++] = currentPlayer;
+            }
+        }
+        // return a copy that excludes potential null entries at the end.
+        return Arrays.copyOf(targetablePlayers, numTargetablePlayers);
     }
 
     /**
@@ -435,28 +475,6 @@ public class GameEngine {
 
         String defaultOption = currentWeapon == null ? null : "Unequip " + currentWeapon.name();
         return querySelection("Weapon Selection", query, options, defaultOption);
-    }
-
-    public Weapon updateWeapons(int selection, Weapon equippedWeapon) {
-        if (equippedWeapon != null) { // unequip current weapon
-            for(int i = numAvailableWeapons; i < weapons.length; i++) {
-                if (weapons[i] == equippedWeapon) {
-                    swap(weapons, i, numAvailableWeapons);
-                    numAvailableWeapons++;
-                }
-            }
-        }
-
-        if (selection == -1) {
-            assert invariantSatisfied();
-            return null;
-        }
-
-        // Equip a new weapon
-        swap(weapons, selection, numAvailableWeapons-1);
-        numAvailableWeapons--;
-        assert invariantSatisfied();
-        return weapons[numAvailableWeapons];
     }
 
 
