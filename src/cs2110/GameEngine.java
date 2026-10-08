@@ -311,6 +311,7 @@ public class GameEngine {
      * array.
      */
     public void assignDamageTo(Actor actor, int damageAmount) {
+        Weapon equippedWeapon = actor.weapon();
         actor.takeDamage(damageAmount);
 
         if (actor.health() == 0) {
@@ -324,10 +325,7 @@ public class GameEngine {
                 numLivingMonsters--;
             } else { // A player
                 if (actor.actorType().equals("fighter")) {
-                    Weapon equippedWeapon = actor.weapon();
-                    if (equippedWeapon != null) {
-                        updateWeapons(-1, equippedWeapon);
-                    }
+                    updateWeapons(-1, equippedWeapon);
                 }
 
                 for (int i = 0; i < numLivingPlayers; i++) {
@@ -383,9 +381,9 @@ public class GameEngine {
     }
 
     /**
-     * Updates the `weapons` array accordingly based the user's `selection` and the Fighter's
-     * currently equipped weapon. When the `equippedWeapon` is not `null`, its corresponding entry
-     * in `weapons[numAvailableWeapons..] will be made the last entry of
+     * Updates the `weapons` array accordingly based the user's `selection` and `equipped weapon`.
+     * When `equippedWeapon` is not `null`, its corresponding entry in
+     * `weapons[numAvailableWeapons..] will be made the last entry of
      * `weapons[..numAvailableWeapons)`. If `selection' is not -1, the `Weapon` at
      * `weapons[selection]` will be made the first entry of `weapons[numAvailableWeapons..]`.
      * Requires `selection == -1` or `0 <= selection < numAvailableWeapons`.

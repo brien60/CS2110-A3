@@ -78,4 +78,16 @@ public class Fighter extends Player {
         return equippedWeapon;
     }
 
+    /**
+     * Performs the same behavior as `takeDamage()` for `Actor`, but additionally sets
+     * `equippedWeapon` to null if the fighter dies from the damage.
+     */
+    @Override
+    public void takeDamage(int damageAmount) {
+        super.takeDamage(damageAmount);
+        if (health() == 0) {
+            equippedWeapon = null;
+        }
+    }
+
 }
