@@ -1,5 +1,8 @@
 package cs2110;
 
+/**
+ * Models a player who can cast a spell.
+ */
 public abstract class Mage extends Player {
 
     /**
@@ -31,7 +34,7 @@ public abstract class Mage extends Player {
     }
 
     /**
-     * Performs the corresponding spell associated with this mage.
+     * Casts the corresponding spell associated with this mage.
      */
     public abstract void castSpell();
 

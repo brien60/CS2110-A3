@@ -1,7 +1,7 @@
 package cs2110;
 
 /**
- * Models a fighter that can equip a Weapon
+ * Models a player that can equip a Weapon.
  */
 public class Fighter extends Player {
 
@@ -58,6 +58,10 @@ public class Fighter extends Player {
         return super.toughness();
     }
 
+    /**
+     * Returns the weapon currently equipped by the fighter (could be null if they don't have a
+     * weapon equipped).
+     */
     @Override
     public Weapon weapon() {
         return equippedWeapon;

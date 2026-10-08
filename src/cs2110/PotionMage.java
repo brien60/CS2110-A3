@@ -1,7 +1,14 @@
 package cs2110;
 
+/**
+ * Models a Mage who can cast a potion spell.
+ */
 public class PotionMage extends Mage {
 
+    /**
+     * Constructs a new PotionMage with the given `name`, a `spellName` of "potion spell", and
+     * initializes their base health and power levels.
+     */
     public PotionMage(String name, GameEngine engine) {
         super(name, "potion spell", engine);
     }
@@ -11,6 +18,9 @@ public class PotionMage extends Mage {
         return "potion mage";
     }
 
+    /**
+     * Adds three randomly generated potions to the potion inventory.
+     */
     @Override
     public void castSpell() {
         String[] potionTypes = {"buff potion", "tuff potion", "invisibility potion"};
