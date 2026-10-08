@@ -199,7 +199,7 @@ public class GameEngine {
     public GameEngine(Scanner sc, boolean echo, Random rng) {
         this.sc = sc;
         this.echo = echo;
-        this.rng = new Random(123456L);
+        this.rng = rng;
 
         players = new Player[0];
         numLivingPlayers = 0;
@@ -324,10 +324,6 @@ public class GameEngine {
                 }
                 numLivingMonsters--;
             } else { // A player
-                if (actor.actorType().equals("fighter")) {
-                    updateWeapons(-1, equippedWeapon);
-                }
-
                 for (int i = 0; i < numLivingPlayers; i++) {
                     if (actor == players[i]) {
                         swap(players, numLivingPlayers - 1, i);
@@ -335,6 +331,10 @@ public class GameEngine {
                     }
                 }
                 numLivingPlayers--;
+
+                if (actor.actorType().equals("fighter")) {
+                    updateWeapons(-1, equippedWeapon);
+                }
             }
         }
         assert invariantSatisfied();
@@ -466,10 +466,22 @@ public class GameEngine {
      * chosen player.
      */
     public Player selectPlayerTarget(Player actingPlayer) {
+        Player[] visiblePlayers = targetablePlayers();
+        int numVisiblePlayers = visiblePlayers.length;
+
+        Player[] targetablePlayers = new Player[numVisiblePlayers + 1];
+
+        if (actingPlayer.isInvisible()) {
+            System.arraycopy(visiblePlayers, 0, targetablePlayers, 0, numVisiblePlayers);
+            targetablePlayers[numVisiblePlayers] = actingPlayer;
+        } else {
+            targetablePlayers = visiblePlayers;
+        }
+
         int index = querySelection("Player Target",
                 "Select the number of the player you'd like to target:",
-                targetablePlayers(), null);
-        return targetablePlayers()[index];
+                targetablePlayers, null);
+        return targetablePlayers[index];
     }
 
     /**
