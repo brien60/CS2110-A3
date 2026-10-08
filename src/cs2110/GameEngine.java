@@ -199,7 +199,7 @@ public class GameEngine {
     public GameEngine(Scanner sc, boolean echo, Random rng) {
         this.sc = sc;
         this.echo = echo;
-        this.rng = rng;
+        this.rng = new Random(123456L);
 
         players = new Player[0];
         numLivingPlayers = 0;
@@ -254,7 +254,6 @@ public class GameEngine {
      * A factory method to produce players of different types.
      */
     private Player createPlayer(String name, int type) {
-        // TODO: Uncomment the case lines as you implement these player subtypes
         return switch (type) {
             case -1 -> new BasicPlayer(name, this);
             case 0 -> new Fighter(name, this);
@@ -391,10 +390,10 @@ public class GameEngine {
      * `weapons[selection]` will be made the first entry of `weapons[numAvailableWeapons..]`.
      * Requires `selection == -1` or `0 <= selection < numAvailableWeapons`.
      */
-    public Weapon updateWeapons(int selection, Weapon equippedWeapon) {
+    public void updateWeapons(int selection, Weapon equippedWeapon) {
         assert selection == -1 || (selection >= 0 && selection < numAvailableWeapons);
 
-        if (equippedWeapon != null) { // unequip current weapon
+        if (equippedWeapon != null) { // unequip
             for (int i = numAvailableWeapons; i < weapons.length; i++) {
                 if (weapons[i] == equippedWeapon) {
                     swap(weapons, i, numAvailableWeapons);
@@ -405,15 +404,15 @@ public class GameEngine {
 
         if (selection == -1) {
             assert invariantSatisfied();
-            return null;
+            return;
         }
 
         // Equip a new weapon
         swap(weapons, selection, numAvailableWeapons - 1);
         numAvailableWeapons--;
         assert invariantSatisfied();
-        return weapons[numAvailableWeapons];
     }
+
 
     /**
      * Increments potionQuantities[i] by 1. Requires `0 <= i < potionQuantities.length`.
@@ -473,6 +472,13 @@ public class GameEngine {
                 "Select the number of the player you'd like to target:",
                 targetablePlayers(), null);
         return targetablePlayers()[index];
+    }
+
+    /**
+     * Returns the `Weapon` referenced by `weapons[index]`
+     */
+    public Weapon getWeaponAtIndex(int index) {
+        return weapons[index];
     }
 
     /* *****************************************************************************
@@ -626,7 +632,7 @@ public class GameEngine {
                 }
 
                 if (actors[i].health() != 0) {
-                    System.out.println("-------------------------------------------------");
+                    System.out.println("------------------------------------------");
                     System.out.printf("Starting %s's Turn:\n\n", actors[i].name());
                     actors[i].takeTurn();
                 }

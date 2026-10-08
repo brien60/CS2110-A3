@@ -32,7 +32,18 @@ public class Fighter extends Player {
         }
 
         int selection = engine.queryWeaponSelection(equippedWeapon);
-        equippedWeapon = engine.updateWeapons(selection, equippedWeapon);
+
+        /* A copy of `equippedWeapon` is necessary as `equippedWeapon` must be modified before the
+        `updateWeapons` call so that the weapons invariant is true when exiting `updateWeapons`. */
+        Weapon equippedWeaponCopy = equippedWeapon;
+
+        if (selection == -1) {
+            equippedWeapon = null;
+        } else {
+            equippedWeapon = engine.getWeaponAtIndex(selection);
+        }
+
+        engine.updateWeapons(selection, equippedWeaponCopy);
 
         return true;
     }
@@ -66,6 +77,5 @@ public class Fighter extends Player {
     public Weapon weapon() {
         return equippedWeapon;
     }
-
 
 }

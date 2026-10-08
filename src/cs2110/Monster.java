@@ -47,8 +47,7 @@ public class Monster extends Actor {
     }
 
     /**
-     * Stuns the monster if `stunned == false`.
-     * If `stunned == true`, then nothing happens.
+     * Stuns the monster if `stunned == false`. If `stunned == true`, then nothing happens.
      */
     public void stun() {
         if (!stunned) {
@@ -58,7 +57,8 @@ public class Monster extends Actor {
 
     /**
      * Launches an attack against a random targetable player unless stunned, in which case it passes
-     * its turn. If no players are targetable, this monster also passes its turn.
+     * its turn and a corresponding message is printed. If no players are targetable, this monster
+     * also passes its turn and a corresponding message is printed.
      */
     @Override
     public void takeTurn() {
