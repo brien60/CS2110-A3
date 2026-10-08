@@ -21,8 +21,8 @@ public class GameEngine {
 
     /**
      * The players in this game simulation. Within this array, the first `numLivingPlayers` entries
-     * reference distinct players with `health() > 0` and the remaining entries reference
-     * distinct players with `health() == 0`.
+     * reference distinct players with `health() > 0` and the remaining entries reference distinct
+     * players with `health() == 0`.
      */
     private Player[] players;
 
@@ -34,8 +34,8 @@ public class GameEngine {
 
     /**
      * The monsters in this game simulation. Within this array, the first `numLivingMonsters`
-     * entries reference distinct monsters with `health() > 0` and the remaining entries
-     * reference distinct monsters with `health() == 0`.
+     * entries reference distinct monsters with `health() > 0` and the remaining entries reference
+     * distinct monsters with `health() == 0`.
      */
     private Monster[] monsters;
 
@@ -47,64 +47,73 @@ public class GameEngine {
 
     /**
      * The weapons that fighters can use during this game simulation. Within this array, the first
-     * `numAvailableWeapons` entries reference distinct weapons that are not equipped by a
-     * player, and the remaining entries reference distinct weapon objects that are equipped by
-     * a player.
+     * `numAvailableWeapons` entries reference distinct weapons that are not equipped by a player,
+     * and the remaining entries reference distinct weapon objects that are equipped by a player.
      */
     private Weapon[] weapons;
 
     /**
-     * The number of weapons not currently equipped by players.
-     * Must have `0 <= numAvailableWeapons <= weapons.length`
+     * The number of weapons not currently equipped by players. Must have `0 <= numAvailableWeapons
+     * <= weapons.length`
      */
     private int numAvailableWeapons;
 
     /**
-     * The potion objects that can be used by a player (if available). Each entry is an instance
-     * of a distinct potion type.
+     * The potion objects that can be used by a player (if available). Each entry is an instance of
+     * a distinct potion type.
      */
     private final Potion[] potions;
     /* Note: Since `Potion` objects are immutable, we only need one instance of each that can be
      * re-used each time this potion is consumed. This is an example of the *singleton* pattern. */
 
     /**
-     * The number of available units of each potion, where `potionQuantities[i]` is the number
-     * of units of `potions[i]`. Must have `potionQuantities.length == potions.length`, and each
-     * entry must be non-negative.
+     * The number of available units of each potion, where `potionQuantities[i]` is the number of
+     * units of `potions[i]`. Must have `potionQuantities.length == potions.length`, and each entry
+     * must be non-negative.
      */
     private final int[] potionQuantities;
 
     /**
      * Returns whether the class invariants on `players`, `numLivingPlayers`, `monsters`,
-     * `numLivingMonsters`, `weapons`, `numAvailableWeapons`, `potions`, and `potionQuantities`
-     * are all satisfied.
+     * `numLivingMonsters`, `weapons`, `numAvailableWeapons`, `potions`, and `potionQuantities` are
+     * all satisfied.
      */
     private boolean invariantSatisfied() {
         // player
         for (int i = 0; i < players.length; i++) {
             if (i < numLivingPlayers) {
-                if (players[i].health() <= 0) return false;
-            }
-            else {
-                if (players[i].health() != 0) return false;
+                if (players[i].health() <= 0) {
+                    return false;
+                }
+            } else {
+                if (players[i].health() != 0) {
+                    return false;
+                }
             }
         }
 
         // numLivingPlayers
-        if (numLivingPlayers < 0 || numLivingPlayers > players.length) return false;
+        if (numLivingPlayers < 0 || numLivingPlayers > players.length) {
+            return false;
+        }
 
         // monsters
         for (int i = 0; i < monsters.length; i++) {
             if (i < numLivingMonsters) {
-                if (monsters[i].health() <= 0) return false;
-            }
-            else {
-                if (monsters[i].health() != 0) return false;
+                if (monsters[i].health() <= 0) {
+                    return false;
+                }
+            } else {
+                if (monsters[i].health() != 0) {
+                    return false;
+                }
             }
         }
 
         // numLivingMonsters
-        if (numLivingMonsters < 0 || numLivingMonsters > monsters.length) return false;
+        if (numLivingMonsters < 0 || numLivingMonsters > monsters.length) {
+            return false;
+        }
 
         // weapons
         for (int i = 0; i < weapons.length; i++) {
@@ -116,13 +125,14 @@ public class GameEngine {
                         return false;
                     }
                 }
-            }
-            else {
+            } else {
                 for (int j = 0; j < players.length; j++) {
                     if (players[j].weapon() != null && players[j].weapon() == weapons[i]) {
                         break;
                     }
-                    if (j == players.length - 1) return false;
+                    if (j == players.length - 1) {
+                        return false;
+                    }
                     /* invariant is broken if a weapon in weapons[numAvailableWeapons..]
                     is not currently equipped by a character */
                 }
@@ -130,15 +140,21 @@ public class GameEngine {
         }
 
         // numAvailable
-        if (numAvailableWeapons < 0 || numAvailableWeapons > weapons.length) return false;
+        if (numAvailableWeapons < 0 || numAvailableWeapons > weapons.length) {
+            return false;
+        }
 
         // potions
         // How distinct potion types?
 
         // potionQuantities
-        if (potionQuantities.length != potions.length) return false;
+        if (potionQuantities.length != potions.length) {
+            return false;
+        }
         for (int i = 0; i < potionQuantities.length; i++) {
-            if (potionQuantities[i] < 0) return false;
+            if (potionQuantities[i] < 0) {
+                return false;
+            }
         }
 
         return true;
@@ -192,7 +208,7 @@ public class GameEngine {
         weapons = new Weapon[0];
         numAvailableWeapons = 0;
 
-        potions = new Potion[] {new BuffPotion(), new TuffPotion(), new InvisibilityPotion()};
+        potions = new Potion[]{new BuffPotion(), new TuffPotion(), new InvisibilityPotion()};
         potionQuantities = new int[potions.length];
     }
 
@@ -228,7 +244,7 @@ public class GameEngine {
 
 //            int type = -1;
             int type = querySelection("Player Type", "What type of player is " + name + "?",
-                new String[]{ "Fighter", "HealingMage", "StunningMage", "PotionMage"}, null);
+                    new String[]{"Fighter", "HealingMage", "StunningMage", "PotionMage"}, null);
             players[i] = createPlayer(name, type);
             System.out.println();
         }
@@ -241,10 +257,10 @@ public class GameEngine {
         // TODO: Uncomment the case lines as you implement these player subtypes
         return switch (type) {
             case -1 -> new BasicPlayer(name, this);
-             case 0 -> new Fighter(name, this);
-             case 1 -> new HealingMage(name, this);
-             case 2 -> new StunningMage(name, this);
-             case 3 -> new PotionMage(name, this);
+            case 0 -> new Fighter(name, this);
+            case 1 -> new HealingMage(name, this);
+            case 2 -> new StunningMage(name, this);
+            case 3 -> new PotionMage(name, this);
             default -> throw new IllegalArgumentException();
         };
     }
@@ -256,7 +272,7 @@ public class GameEngine {
         numLivingMonsters = (players.length / 2) + 1;
 
         System.out.printf("%nYou'll battle against %d monster%s:%n", numLivingMonsters,
-            numLivingMonsters > 1 ? "s" : "");
+                numLivingMonsters > 1 ? "s" : "");
 
         monsters = new Monster[numLivingMonsters];
         for (int i = 0; i < numLivingMonsters; i++) {
@@ -289,11 +305,11 @@ public class GameEngine {
      *******************************************************************************/
 
     /**
-     * Processes an assignment of `damageAmount` points of damage to the given `actor`,
-     * updating the state of the game engine appropriately if this causes that actor to die.
-     * When a Player or Monster dies, swap it with the last currently living actor in its
-     * corresponding array to restore that invariant. Thus, the newly-deceased actor becomes
-     * the first dead actor in its array.
+     * Processes an assignment of `damageAmount` points of damage to the given `actor`, updating the
+     * state of the game engine appropriately if this causes that actor to die. When a Player or
+     * Monster dies, swap it with the last currently living actor in its corresponding array to
+     * restore that invariant. Thus, the newly-deceased actor becomes the first dead actor in its
+     * array.
      */
     public void assignDamageTo(Actor actor, int damageAmount) {
         actor.takeDamage(damageAmount);
@@ -302,13 +318,12 @@ public class GameEngine {
             if (actor.actorType().equals("monster")) {
                 for (int i = 0; i < numLivingMonsters; i++) {
                     if (actor == monsters[i]) {
-                        swap(monsters, numLivingMonsters-1, i);
+                        swap(monsters, numLivingMonsters - 1, i);
                         break;
                     }
                 }
                 numLivingMonsters--;
-            }
-            else { // A player
+            } else { // A player
                 if (actor.actorType().equals("fighter")) {
                     Weapon equippedWeapon = actor.weapon();
                     if (equippedWeapon != null) {
@@ -318,7 +333,7 @@ public class GameEngine {
 
                 for (int i = 0; i < numLivingPlayers; i++) {
                     if (actor == players[i]) {
-                        swap(players, numLivingPlayers-1, i);
+                        swap(players, numLivingPlayers - 1, i);
                         break;
                     }
                 }
@@ -331,9 +346,9 @@ public class GameEngine {
 
 
     /**
-     * Prompts the player to select a potion type from the available inventory (or decline to use
-     * a potion). If a potion is selected, then the inventory is updated and that potion is
-     * returned. Otherwise, null is returned and no changes are made to the potion inventory.
+     * Prompts the player to select a potion type from the available inventory (or decline to use a
+     * potion). If a potion is selected, then the inventory is updated and that potion is returned.
+     * Otherwise, null is returned and no changes are made to the potion inventory.
      */
     public Potion selectPotion() {
         int l = potions.length;
@@ -343,7 +358,8 @@ public class GameEngine {
         for (int i = 0; i < l; i++) {
             if (potionQuantities[i] > 0) { // potion is available
                 available[numPotionTypes] = i; // add to availability map
-                potionOptions[numPotionTypes] = potions[i] + " (quantity = " + potionQuantities[i] + ")";
+                potionOptions[numPotionTypes] =
+                        potions[i] + " (quantity = " + potionQuantities[i] + ")";
                 numPotionTypes++;
             }
         }
@@ -367,9 +383,19 @@ public class GameEngine {
         return selected;
     }
 
+    /**
+     * Updates the `weapons` array accordingly based the user's `selection` and the Fighter's
+     * currently equipped weapon. When the `equippedWeapon` is not `null`, its corresponding entry
+     * in `weapons[numAvailableWeapons..] will be made the last entry of
+     * `weapons[..numAvailableWeapons)`. If `selection' is not -1, the `Weapon` at
+     * `weapons[selection]` will be made the first entry of `weapons[numAvailableWeapons..]`.
+     * Requires `selection == -1` or `0 <= selection < numAvailableWeapons`.
+     */
     public Weapon updateWeapons(int selection, Weapon equippedWeapon) {
+        assert selection == -1 || (selection >= 0 && selection < numAvailableWeapons);
+
         if (equippedWeapon != null) { // unequip current weapon
-            for(int i = numAvailableWeapons; i < weapons.length; i++) {
+            for (int i = numAvailableWeapons; i < weapons.length; i++) {
                 if (weapons[i] == equippedWeapon) {
                     swap(weapons, i, numAvailableWeapons);
                     numAvailableWeapons++;
@@ -383,15 +409,14 @@ public class GameEngine {
         }
 
         // Equip a new weapon
-        swap(weapons, selection, numAvailableWeapons-1);
+        swap(weapons, selection, numAvailableWeapons - 1);
         numAvailableWeapons--;
         assert invariantSatisfied();
         return weapons[numAvailableWeapons];
     }
 
     /**
-     * Increments potionQuantities[i] by 1.
-     * Requires `0 <= i < potionQuantities.length`.
+     * Increments potionQuantities[i] by 1. Requires `0 <= i < potionQuantities.length`.
      */
     public void addPotion(int i) {
         potionQuantities[i]++;
@@ -403,8 +428,8 @@ public class GameEngine {
      *******************************************************************************/
 
     /**
-     * Returns a reference to an array copy containing references to all players who
-     * can currently be targeted by spells and monster attacks, in their order in `players`.
+     * Returns a reference to an array copy containing references to all players who can currently
+     * be targeted by spells and monster attacks, in their order in `players`.
      */
     public Player[] targetablePlayers() {
         int numTargetablePlayers = 0;
@@ -429,22 +454,23 @@ public class GameEngine {
     }
 
     /**
-     * Prompts the user to select a monster from the list of all living monsters, and returns
-     * a reference to the chosen monster.
+     * Prompts the user to select a monster from the list of all living monsters, and returns a
+     * reference to the chosen monster.
      */
     public Monster selectMonsterTarget() {
         int index = querySelection("Monster Target", "Select the number of the monster you'd like "
-            + "to target:", livingMonsters(), null);
+                + "to target:", livingMonsters(), null);
         return livingMonsters()[index];
     }
 
     /**
      * Prompts the user to select a player from the list of all currently targetable players (as
-     * well as the `actingPlayer` if they are not currently targetable). Returns a reference to
-     * the chosen player.
+     * well as the `actingPlayer` if they are not currently targetable). Returns a reference to the
+     * chosen player.
      */
     public Player selectPlayerTarget(Player actingPlayer) {
-        int index = querySelection("Player Target", "Select the number of the player you'd like to target:",
+        int index = querySelection("Player Target",
+                "Select the number of the player you'd like to target:",
                 targetablePlayers(), null);
         return targetablePlayers()[index];
     }
@@ -469,6 +495,13 @@ public class GameEngine {
         return querySelection("Yes/No", query, new String[]{"No", "Yes"}, null) == 1;
     }
 
+    /**
+     * Presents the user with a list of numbered options of the weapons they can have their player
+     * equip. Each option will contain the selection index, followed by a space and the String
+     * representation of an available `Weapon`. If the player currently has a weapon equipped, then
+     * after the list of available weapons, the user will additionally have the option to unequip
+     * it.
+     */
     public int queryWeaponSelection(Weapon currentWeapon) {
         String query = "Select the weapon that you'd like to equip:";
         Weapon[] options = Arrays.copyOfRange(weapons, 0, numAvailableWeapons);
@@ -479,13 +512,14 @@ public class GameEngine {
 
 
     /**
-     * Presents the user with a list of numbered `options` with the given `query`, prompting them
-     * to input a number to make a selection. Validates the input before returning it. If
+     * Presents the user with a list of numbered `options` with the given `query`, prompting them to
+     * input a number to make a selection. Validates the input before returning it. If
      * `defaultOption != null`, then this is presented as the final option numbered `-1`. When an
      * invalid selection is made, the `queryName` is written into the exception message for
      * debugging.
      */
-    private int querySelection(String queryName, String query, Object[] options, String defaultOption) {
+    private int querySelection(String queryName, String query, Object[] options,
+            String defaultOption) {
         System.out.println(query);
 
         for (int i = 0; i < options.length; i++) {
@@ -499,12 +533,14 @@ public class GameEngine {
         System.out.print("Selection: ");
         try {
             int selection = Integer.parseInt(getInputLine());
-            if (selection >= options.length || selection < -1 || (selection == -1 && defaultOption == null)) {
+            if (selection >= options.length || selection < -1 || (selection == -1
+                    && defaultOption == null)) {
                 throw new IllegalArgumentException("invalid selection " + selection);
             }
             return selection;
         } catch (Exception e) { // either input was not a number or was an invalid index
-            throw new RuntimeException("Query of " + queryName + " unsuccessful: " + e.getMessage());
+            throw new RuntimeException(
+                    "Query of " + queryName + " unsuccessful: " + e.getMessage());
         }
     }
 
@@ -539,8 +575,8 @@ public class GameEngine {
     }
 
     /**
-     * Returns a randomly selected name from among the first 100 in the given `file`, or returns
-     * the given `defaultName` if there's an IOException.
+     * Returns a randomly selected name from among the first 100 in the given `file`, or returns the
+     * given `defaultName` if there's an IOException.
      */
     private String getRandomName(String file, String defaultName) {
         try {
@@ -556,14 +592,14 @@ public class GameEngine {
      *******************************************************************************/
 
     /**
-     * Runs the main game loop. Terminates when the players have won (all monsters are dead) or
-     * lost (all players are dead). While there are still living players and monsters, constructs
-     * an unshuffled turn-order array with living Players in their order in `players`, followed by
-     * living Monsters in their order in `monsters`, then generates and executes a random turn
-     * order from that array at the start of each round. At the end of the game, if the players
-     * have won, the message "Congratulations! You defeated the monsters!" is printed. Otherwise,
-     * if the players have lost, the message "The monsters defeated you. Better luck next time!"
-     * is printed.
+     * Runs the main game loop. Terminates when the players have won (all monsters are dead) or lost
+     * (all players are dead). While there are still living players and monsters, constructs an
+     * unshuffled turn-order array with living Players in their order in `players`, followed by
+     * living Monsters in their order in `monsters`, then generates and executes a random turn order
+     * from that array at the start of each round. At the end of the game, if the players have won,
+     * the message "Congratulations! You defeated the monsters!" is printed. Otherwise, if the
+     * players have lost, the message "The monsters defeated you. Better luck next time!" is
+     * printed.
      */
     @SuppressWarnings("ForLoopReplaceableByForEach")
     public void runMainGameLoop() {
@@ -585,7 +621,9 @@ public class GameEngine {
             }
 
             for (int i = 0; i < actors.length; i++) { // have the actors take their turns
-                if (numLivingPlayers == 0 || numLivingMonsters == 0) break;
+                if (numLivingPlayers == 0 || numLivingMonsters == 0) {
+                    break;
+                }
 
                 if (actors[i].health() != 0) {
                     System.out.println("-------------------------------------------------");
@@ -599,10 +637,10 @@ public class GameEngine {
 
         if (numLivingPlayers == 0) {
             System.out.println("The monsters defeated you. Better luck next time!");
-        }
-        else
+        } else {
             System.out.println("Congratulations! You defeated the monsters!");
         }
+    }
 
     /**
      * Runs this game simulation.

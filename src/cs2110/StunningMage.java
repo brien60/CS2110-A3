@@ -3,7 +3,7 @@ package cs2110;
 public class StunningMage extends Mage {
 
     public StunningMage(String name, GameEngine engine) {
-        super(name, engine, "stunning spell");
+        super(name, "stunning spell", engine);
     }
 
     @Override

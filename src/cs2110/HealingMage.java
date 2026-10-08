@@ -1,8 +1,9 @@
 package cs2110;
 
-public class HealingMage extends Mage{
+public class HealingMage extends Mage {
+
     public HealingMage(String name, GameEngine engine) {
-        super(name, engine, "healing spell");
+        super(name, "healing spell", engine);
     }
 
     @Override
