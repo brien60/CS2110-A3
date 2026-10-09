@@ -21,7 +21,8 @@ public class Fighter extends Player {
 
     /**
      * Queries the user whether they want this fighter to change their equipment, takes the
-     * appropriate action (could be to do nothing) based on the user's input, and returns true.
+     * appropriate action (could be to do nothing and return) based on the user's input, and returns
+     * true.
      */
     @Override
     public boolean chooseAction() {
@@ -69,10 +70,7 @@ public class Fighter extends Player {
         return super.toughness();
     }
 
-    /**
-     * Returns the weapon currently equipped by the fighter (could be null if they don't have a
-     * weapon equipped).
-     */
+
     @Override
     public Weapon weapon() {
         return equippedWeapon;

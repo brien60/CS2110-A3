@@ -47,7 +47,8 @@ public class Monster extends Actor {
     }
 
     /**
-     * Stuns the monster if `stunned == false`. If `stunned == true`, then nothing happens.
+     * Stuns the monster if it is not currently  stunned. If the monster is already stunned, then
+     * nothing happens.
      */
     public void stun() {
         if (!stunned) {

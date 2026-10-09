@@ -73,12 +73,30 @@ public class GameEngine {
      */
     private final int[] potionQuantities;
 
+
     /**
      * Returns whether the class invariants on `players`, `numLivingPlayers`, `monsters`,
      * `numLivingMonsters`, `weapons`, `numAvailableWeapons`, `potions`, and `potionQuantities` are
      * all satisfied.
      */
     private boolean invariantSatisfied() {
+        // Check bounds first
+
+        // numLivingPlayers
+        if (numLivingPlayers < 0 || numLivingPlayers > players.length) {
+            return false;
+        }
+
+        // numLivingMonsters
+        if (numLivingMonsters < 0 || numLivingMonsters > monsters.length) {
+            return false;
+        }
+
+        // numAvailableWeapons
+        if (numAvailableWeapons < 0 || numAvailableWeapons > weapons.length) {
+            return false;
+        }
+
         // player
         for (int i = 0; i < players.length; i++) {
             if (i < numLivingPlayers) {
@@ -91,10 +109,13 @@ public class GameEngine {
                 }
             }
         }
-
-        // numLivingPlayers
-        if (numLivingPlayers < 0 || numLivingPlayers > players.length) {
-            return false;
+        // distinct players
+        for (int i = 0; i < players.length; i++) {
+            for (int j = i + 1; j < players.length; j++) {
+                if (players[i] == players[j]) {
+                    return false;
+                }
+            }
         }
 
         // monsters
@@ -109,43 +130,58 @@ public class GameEngine {
                 }
             }
         }
-
-        // numLivingMonsters
-        if (numLivingMonsters < 0 || numLivingMonsters > monsters.length) {
-            return false;
+        // distinct monsters
+        for (int i = 0; i < monsters.length; i++) {
+            for (int j = i + 1; j < monsters.length; j++) {
+                if (monsters[i] == monsters[j]) {
+                    return false;
+                }
+            }
         }
 
         // weapons
         for (int i = 0; i < weapons.length; i++) {
             if (i < numAvailableWeapons) {
                 for (int j = 0; j < players.length; j++) {
-                    if (players[j].weapon() != null && players[j].weapon() == weapons[i]) {
+                    if (players[j].weapon() == weapons[i]) {
                         /* invariant is broken if a weapon in weapons[..numAvailableWeapons)
                         is currently equipped by a character */
                         return false;
                     }
                 }
             } else {
+                boolean equipped = false;
                 for (int j = 0; j < players.length; j++) {
-                    if (players[j].weapon() != null && players[j].weapon() == weapons[i]) {
+                    if (players[j].weapon() == weapons[i]) {
+                        equipped = true;
                         break;
                     }
-                    if (j == players.length - 1) {
-                        return false;
-                    }
-                    /* invariant is broken if a weapon in weapons[numAvailableWeapons..]
-                    is not currently equipped by a character */
+                }
+                /* invariant is broken if a weapon in weapons[numAvailableWeapons..] is not
+                currently equipped by a character */
+                if (!equipped) {
+                    return false;
+                }
+            }
+        }
+        // distinct weapons
+        for (int i = 0; i < weapons.length; i++) {
+            for (int j = i + 1; j < weapons.length; j++) {
+                if (weapons[i] == weapons[j]) {
+                    return false;
                 }
             }
         }
 
-        // numAvailable
-        if (numAvailableWeapons < 0 || numAvailableWeapons > weapons.length) {
-            return false;
-        }
-
         // potions
-        // How distinct potion types?
+        // distinct potion types
+        for (int i = 0; i < potions.length; i++) {
+            for (int j = i + 1; j < potions.length; j++) {
+                if (potions[i].name().equals(potions[j].name())) {
+                    return false;
+                }
+            }
+        }
 
         // potionQuantities
         if (potionQuantities.length != potions.length) {
@@ -156,9 +192,7 @@ public class GameEngine {
                 return false;
             }
         }
-
         return true;
-
     }
 
     /* *****************************************************************************
@@ -311,6 +345,7 @@ public class GameEngine {
      * array.
      */
     public void assignDamageTo(Actor actor, int damageAmount) {
+        // store the currently equipped weapon (could be null) as it may be changed if actor dies.
         Weapon equippedWeapon = actor.weapon();
         actor.takeDamage(damageAmount);
 
@@ -384,9 +419,10 @@ public class GameEngine {
      * Updates the `weapons` array accordingly based the user's `selection` and `equipped weapon`.
      * When `equippedWeapon` is not `null`, its corresponding entry in
      * `weapons[numAvailableWeapons..] will be made the last entry of
-     * `weapons[..numAvailableWeapons)`. If `selection' is not -1, the `Weapon` at
-     * `weapons[selection]` will be made the first entry of `weapons[numAvailableWeapons..]`.
-     * Requires `selection == -1` or `0 <= selection < numAvailableWeapons`.
+     * `weapons[..numAvailableWeapons)`. Then, if `selection` is -1, the method does nothing and
+     * returns. Otherwise, the `Weapon` at `weapons[selection]` will be made the first entry of
+     * `weapons[numAvailableWeapons..]`. Requires `selection == -1` or `0 <= selection <
+     * numAvailableWeapons`.
      */
     public void updateWeapons(int selection, Weapon equippedWeapon) {
         assert selection == -1 || (selection >= 0 && selection < numAvailableWeapons);
@@ -515,8 +551,8 @@ public class GameEngine {
      * Presents the user with a list of numbered options of the weapons they can have their player
      * equip. Each option will contain the selection index, followed by a space and the String
      * representation of an available `Weapon`. If the player currently has a weapon equipped, then
-     * after the list of available weapons, the user will additionally have the option to unequip
-     * it.
+     * after the list of available weapons the user will have the additional option to unequip it.
+     * Returns the selection index chosen by the user.
      */
     public int queryWeaponSelection(Weapon currentWeapon) {
         String query = "Select the weapon that you'd like to equip:";
